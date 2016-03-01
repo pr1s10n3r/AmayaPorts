@@ -51,7 +51,7 @@ int main(int argc, char **argv)
     	{
     		hflag = 1;
     		usage();
-			break;
+		break;
     	}
     	else if ((strcmp(argv[i], "--version") == 0))
     	{
@@ -60,16 +60,16 @@ int main(int argc, char **argv)
     		break;
     	}
     	else if ((strcmp(argv[i], "-n") == 0) || (strcmp(argv[i], "--number") == 0))
-			flags[0] = 1;
-		else if ((strcmp(argv[i], "-E") == 0) || (strcmp(argv[i], "--show-ends") == 0) || (strcmp(argv[i], "-e") == 0))
-			flags[1] = 1;
-		else if ((strcmp(argv[i], "-t") == 0) || (strcmp(argv[i], "-T") == 0) || (strcmp(argv[i], "--show-tabs") == 0))
-			flags[2] = 1;
-		else if ((strcmp(argv[i], "-b") == 0) || (strcmp(argv[i], "--number-nonblank") == 0))
-		{
-			flags[0] = 0;
-			flags[3] = 1;
-		}
+		flags[0] = 1;
+	else if ((strcmp(argv[i], "-E") == 0) || (strcmp(argv[i], "--show-ends") == 0) || (strcmp(argv[i], "-e") == 0))
+		flags[1] = 1;
+	else if ((strcmp(argv[i], "-t") == 0) || (strcmp(argv[i], "-T") == 0) || (strcmp(argv[i], "--show-tabs") == 0))
+		flags[2] = 1;
+	else if ((strcmp(argv[i], "-b") == 0) || (strcmp(argv[i], "--number-nonblank") == 0))
+	{
+		flags[0] = 0;
+		flags[3] = 1;
+	}
     }
 
     if (hflag || vflag)
