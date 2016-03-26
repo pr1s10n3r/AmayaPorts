@@ -23,7 +23,7 @@ void *memchr(const void *ptr, int value, size_t num)
 
 	while (num-- != 0)
 		if ((unsigned char)value == *p_s++)
-			return (void*)(p - 1);
+			return (void*)(p_s - 1);
 
 	return NULL;
 }
