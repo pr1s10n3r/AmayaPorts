@@ -95,7 +95,7 @@ static void usage(void)
 {
   printf("Modo de empleo: sleep NÚMERO[SUFIJO]...\n"
          "        o bien: sleep OPCIÓN\n\n");
-  printf("Hace una pausa de NÚMERO segundos. El SUFIJO puse ser 's' para segundos\n"
+  printf("Hace una pausa de NÚMERO segundos. El SUFIJO puede ser 's' para segundos\n"
          "(predeterminado), 'm' para minutos, 'h' para horas o 'd' para días.\n\n");
   printf("      --help     muestra esta ayuda y finaliza\n"
          "      --version  informa de la versión y finaliza\n");
