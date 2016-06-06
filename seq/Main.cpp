@@ -163,8 +163,6 @@ static void seq(int argc, char* argv[], int flags[3])
 		{
 			int n_len = floor(log10(abs((double)first)) + 1);
 			
-			printf("n_len -> %d | zeros_len -> %d | ", n_len, zeros_len);
-			
 			if (zeros_len == n_len)
 				zeros = "";
 			else if (n_len < zeros_len)
