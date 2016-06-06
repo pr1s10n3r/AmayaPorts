@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <math.h>
 
 #define VERSION "v6.0"
 
@@ -26,7 +27,7 @@ static void help(void);
 static void version(void);
 static void seq(int argc, char* argv[], int flags[3]);
 
-static int flags[3];  /* Aún sin uso */
+static int flags[3];
 static int hflag = 0, vflag = 0;
 
 int main(int argc, char* argv[])
@@ -34,11 +35,6 @@ int main(int argc, char* argv[])
 	if (argc < 2)
 	{
 		usage("falta un operando", NULL, NULL);
-		return 0;
-	}
-	else if (argc > 7) /* 7 argumentos máximos con las opciones incluidas */
-	{
-		usage("operando extra «", argv[argc - 1], "»");
 		return 0;
 	}
 
@@ -59,7 +55,18 @@ int main(int argc, char* argv[])
 			vflag = 1;
 			break;
 		}
+		else if ((strcmp(argv[i], "-w") == 0) || (strcmp(argv[i], "--equal-width") == 0))
+		{
+			flags[0] = 1;
+			continue;
+		}
 		/* TODO: Agregar las opciones, pensando la forma de cómo... */
+	}
+	
+	if (argc > 5 && (!flags[0] || !flags[1] || !flags[2]))
+	{
+		usage("operando extra «", argv[argc - 1], "»");
+		return 0;
 	}
 
 	if (hflag || vflag)
@@ -85,36 +92,44 @@ static void seq(int argc, char* argv[], int flags[3])
 			continue;
 		else if (strcmp(argv[i], "--version") == 0)
 			continue;
+		else if ((strcmp(argv[i], "-w") == 0) || (strcmp(argv[i], "--equal-width") == 0))
+			continue;
 		else
 		{
 			/* FIRST */
-			if (!fCustom && argc > 2)
+			if (!fCustom)
 			{
-				first   = atoi(argv[i]);
-				fCustom = 1;
-				continue;
+				if (argc > 2 && (!flags[0] || !flags[1] || !flags[2]) && argv[i + 1] != NULL)
+				{
+					first   = atoi(argv[i]);
+					fCustom = 1;
+					continue;
+				}
 			}
 
 			/* INCREMENTO */
-			if (argc > 3 && (argv[i - 1] != NULL && argv[i + 1] != NULL) && !iCustom)
+			if (!iCustom && argc >= 3)
 			{
-				incremento = atoi(argv[i]);
-				iCustom    = 1;	
-				continue; 
+				if (!(flags[0] && flags[1] && flags[2]) && (argv[i - 1] != NULL && argv[i + 1] != NULL))
+				{
+					incremento = atoi(argv[i]);
+					iCustom    = 1;	
+					continue;
+				}
 			}
 
 			/* LAST */
 			if (!lCustom)
 			{
-				if (argc < 2)
+				if (argc > 2)
 				{
-					last    = atoi(argv[argc - 1]);
+					last = atoi(argv[argc - 1]);
 					lCustom = 1;
 					continue;
-				}	
+				}
 				else
 				{
-					last    = atoi(argv[i]);
+					last = atoi(argv[i]);
 					lCustom = 1;
 					continue;
 				}
@@ -122,9 +137,46 @@ static void seq(int argc, char* argv[], int flags[3])
 		}
 	}
 
-	while (first <= last)
+	if (last < first)
+		return;
+
+	char* zeros = ""; // default
+	size_t zeros_len;
+
+	if (flags[0])
 	{
-		printf("%d%s", first, separator);
+		if (last)
+		{
+			zeros_len = floor(log10(abs((double)last)) + 1);
+			zeros = new char[zeros_len + 2];
+	
+			for (int i = 0; i <= zeros_len; i++)
+				zeros[i] = '0';
+				
+			zeros[zeros_len] = '\0';
+		}
+	}
+
+	while (first <= last)
+	{	
+		if (flags[0])
+		{
+			int n_len = floor(log10(abs((double)first)) + 1);
+			
+			printf("n_len -> %d | zeros_len -> %d | ", n_len, zeros_len);
+			
+			if (zeros_len == n_len)
+				zeros = "";
+			else if (n_len < zeros_len)
+			{
+				int n = sizeof(zeros) / sizeof(zeros)[0];
+				
+				for (int i = n; i >= zeros_len - n_len; i--)
+					zeros[i] = '\0';
+			}
+		}
+		
+		printf("%s%d%s", zeros, first, separator);
 		first += incremento;
 	}
 }
