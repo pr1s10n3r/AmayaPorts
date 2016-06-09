@@ -82,7 +82,12 @@ static void dirname(int argc, char* argv[])
 
             for (int j = 0; j <= nSize; j++)
             {
-                if (argv[i][j] == '/' && !sChecked)
+                if (argv[i][j] == '.')
+                {
+                    printf("%c", argv[i][j]);
+                    continue;
+                }
+                else if (argv[i][j] == '/' && !sChecked)
                 {
                     printf("%c", argv[i][j]);
                     sChecked = 1;
