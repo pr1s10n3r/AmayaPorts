@@ -78,7 +78,7 @@ static void dirname(int argc, char* argv[])
         else
         {
             size_t nSize = strlen(argv[i]);
-            int sChecked = 0;
+            int sChecked = 0, cFor = 0;
 
             for (int j = 0; j <= nSize; j++)
             {
@@ -89,18 +89,48 @@ static void dirname(int argc, char* argv[])
                 }
                 else if (argv[i][j] == '/' && !sChecked)
                 {
+                    for (int w = 0; w <= j; w++)
+                    {
+                        if ((argv[i][j + w] == '/'))
+                        {
+                            for (int z = 0; z <= j; z++)
+                            {
+                                /* TODO: ESTE IF NO FUNCIONA... ARREGLANDO...*/
+                                if ((argv[i][j + w + z] == '/' && argv[i][j + w + z + 1] == '\0') ||
+                                    (argv[i][j + w + z] == '\0'))
+                                {
+                                    cFor = 1;
+                                    break;
+                                }
+                            }
+
+                            if (cFor)
+                                break;
+                        }
+                        else
+                            continue;
+                    }
+
                     printf("%c", argv[i][j]);
                     sChecked = 1;
                     continue;
                 }
                 else
                 {
-                    if (argv[i][j] != '/')
+                    if (cFor)
                     {
-                        printf("%c", argv[i][j]);
+                        cFor = 0;
+                        break;
+                    }
+                    else
+                    {
+                        if (argv[i][j] != '/')
+                        {
+                            printf("%c", argv[i][j]);
 
-                        if (argv[i][j + 1] == '/')
-                            break;
+                            if (argv[i][j + 1] == '/' && sChecked)
+                                break;
+                        }
                     }
                 }
             }
@@ -119,7 +149,7 @@ static void usage(const char* msg)
 
 static void version(void)
 {
-    printf("dirname (AmayaOS CoreUtils) %s\n"
+    printf("dirname (Amaya CoreUtils) %s\n"
            "Copyright © 2016 AmayaOS, Inc.\n"
            "Licencia GPLv3+: GPL de GNU versión 3 o posterior\n"
            "<http://gnu.org/licenses/gpl.html>.\n"
