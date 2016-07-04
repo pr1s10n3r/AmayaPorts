@@ -1,0 +1,6 @@
+#include "stdlib.h"
+
+long a64l(const char* s)
+{
+  long shift = 0;
+}
