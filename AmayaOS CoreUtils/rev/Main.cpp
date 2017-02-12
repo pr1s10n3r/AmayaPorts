@@ -55,7 +55,6 @@ int main(int argc, const char* argv[])
         return 0;
 
     int errno = 0;
-    char* errMsg;
 
     FILE* file = NULL;
     for (int i = 1; i < argc; i++)
