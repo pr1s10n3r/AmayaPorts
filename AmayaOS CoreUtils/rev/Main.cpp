@@ -29,7 +29,7 @@ int main(int argc, const char* argv[])
     //TODO: Agregar soporte para STDIN
     if (argc < 2)
     {
-        printf("Usage: '%s [OPCTIONES...] [FICHEROS...]'\n", argv[0]);
+        printf("Usage: '%s [OPCIONES...] [FICHEROS...]'\n", argv[0]);
         return 1;
     }
 
