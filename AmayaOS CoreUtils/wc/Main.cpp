@@ -28,8 +28,8 @@ static int read(int, char*);
 static size_t get_file_size(const char*);
 
 static int hflag, vflag;
-        /* bytes, chars, lines, words */
-static int cflag, mflag, lflag, wflag;
+        /* bytes, chars, lines, words, max-line */
+static int cflag, mflag, lflag, wflag, mlflag;
 
 int main(int argc, char* argv[])
 {
@@ -56,6 +56,8 @@ int main(int argc, char* argv[])
             mflag = 1;
         else if ((strcmp(argv[i], "-l") == 0) || (strcmp(argv[i], "--lines") == 0))
             lflag = 1;
+        else if ((strcmp(argv[i], "-L") == 0) || (strcmp(argv[i], "--max-line-length") == 0))
+            mlflag = 1;
         else
         {
             if (argv[i][0] == '-')
@@ -88,7 +90,7 @@ int main(int argc, char* argv[])
     }
 
     /* Si no hay ninguna flag -> formateamos la salida. */
-    if (cflag + mflag + lflag + wflag == 0)
+    if (cflag + mflag + lflag + wflag + mlflag == 0)
         lflag = wflag = cflag = 1;
 
     if (hflag || vflag)
@@ -121,9 +123,22 @@ static int read(int argc, char* argv)
     unsigned char cnt[get_file_size(argv)];
     int n_bytes = fread(cnt, 1, sizeof(cnt), file);
 
-    int lineas = 0, chars = 0, words = 0;
+    int lineas = 0, chars = 0, words = 0, tmp_max = 0, max_line = 0;
     for (unsigned int i = 0; i < n_bytes; i++)
     {
+        // Aquí hay un problema cuando lee archivos binarios
+        // No arroja el mismo resultado que el "wc" de GNU Coreutils.
+        if (mlflag)
+        {
+            if (cnt[i] != '\n')
+                tmp_max++;
+            else
+                tmp_max = 0;
+
+            if (tmp_max > max_line)
+                max_line = tmp_max - 1;
+        }
+
         if (lflag)
             if (cnt[i] == '\n')
                 lineas++;
@@ -133,11 +148,13 @@ static int read(int argc, char* argv)
     if (lflag)
         printf(" %d ", lineas);
     if (wflag)
-        printf(" %d ", words); /* TO-DO */
+        printf(" %d ", words);
     if (cflag)
         printf(" %d ", n_bytes);
     if (mflag)
         printf(" %d ", chars);
+    if (mlflag)
+        printf(" %d ", max_line);
 
     printf("%s\n", argv);
 
@@ -151,12 +168,13 @@ static void usage(void)
            "Sin FICHERO, o cuando FICHERO es -, lee la entrada estándar.\n\n"
            "Las siguientes opciones pueden utilizarse para seleccionar cuáles cuentas se imprimen,"
            "siempre en el siguiente orden: newline, word, character, byte, maximum line length.\n"
-           "  -c, --bytes    Imprime el número de bytes\n"
-           "  -m, --chars    Imprime el número de caracteres\n"
-           "  -l, --lines    Imprime el número de líneas\n"
-           "  -w, --words    Imprime el número de palabras\n\n"
-           "      --help     Muestra ésta ayuda y finaliza\n"
-           "      --version  Informa de la versión y finaliza\n\n"
+           "  -c, --bytes            Imprime el número de bytes\n"
+           // "  -m, --chars            Imprime el número de caracteres\n"
+           "  -l, --lines            Imprime el número de líneas\n"
+           "  -L, --max-line-length  Imprime el tamaño máximo de línea\n"
+           // "  -w, --words            Imprime el número de palabras\n\n"
+           "      --help             Muestra ésta ayuda y finaliza\n"
+           "      --version          Informa de la versión y finaliza\n\n"
 
            "ayuda en línea sobre AmayaOS CoreUtils: <https://wiki.amayaos.com/index.php/AmayaCoreutils>\n"
            "Informe de errores de traducción en wc a <alvarostagg@openmailbox.org>\n"
