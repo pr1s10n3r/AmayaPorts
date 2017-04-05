@@ -56,6 +56,8 @@ int main(int argc, char* argv[])
             mflag = 1;
         else if ((strcmp(argv[i], "-l") == 0) || (strcmp(argv[i], "--lines") == 0))
             lflag = 1;
+        else if ((strcmp(argv[i], "-w") == 0) || (strcmp(argv[i], "--words") == 0))
+            wflag = 1;
         else if ((strcmp(argv[i], "-L") == 0) || (strcmp(argv[i], "--max-line-length") == 0))
             mlflag = 1;
         else
@@ -127,9 +129,10 @@ static int read(int argc, char* argv)
     int n_bytes = fread(cnt, 1, sizeof(cnt), file);
 
     int lineas = 0, chars = 0, words = 0, tmp_max = 0, max_line = 0;
+    int in_word = 0;
     for (unsigned int i = 0; i < n_bytes; i++)
     {
-        // Aquí hay un problema cuando lee archivos binarios
+        // Aquí hay un "problema" cuando lee archivos binarios
         // No arroja el mismo resultado que el "wc" de GNU Coreutils.
         if (mlflag)
         {
@@ -146,11 +149,29 @@ static int read(int argc, char* argv)
             if (cnt[i] == '\n')
                 lineas++;
 
-        // No estoy seguro si es hasta -65.
+        // No estoy seguro si es hasta -65, pero funciona.
         if (mflag)
             if (cnt[i] >= -65 && cnt[i] <= 127)
                 chars++;
-        /* TO-DO: Agregar wflag */
+
+        if (wflag)
+        {
+            switch (cnt[i])
+            {
+                case ' ':
+                case '\n':
+                case '\t':
+                case '\r':
+                    if (in_word)
+                    {
+                        in_word = 0;
+                        words++;
+                    }
+                    break;
+                default:
+                    in_word = 1;
+            }
+        }
     }
 
     if (lflag)
@@ -180,7 +201,7 @@ static void usage(void)
            "  -m, --chars            Imprime el número de caracteres\n"
            "  -l, --lines            Imprime el número de líneas\n"
            "  -L, --max-line-length  Imprime el tamaño máximo de línea\n"
-           // "  -w, --words            Imprime el número de palabras\n\n"
+           "  -w, --words            Imprime el número de palabras\n\n"
            "      --help             Muestra ésta ayuda y finaliza\n"
            "      --version          Informa de la versión y finaliza\n\n"
 
