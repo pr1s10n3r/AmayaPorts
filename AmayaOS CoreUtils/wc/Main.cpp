@@ -91,7 +91,10 @@ int main(int argc, char* argv[])
 
     /* Si no hay ninguna flag -> formateamos la salida. */
     if (cflag + mflag + lflag + wflag + mlflag == 0)
+    {
+        printf(" ");
         lflag = wflag = cflag = 1;
+    }
 
     if (hflag || vflag)
         return ret;
@@ -120,7 +123,7 @@ static int read(int argc, char* argv)
     if (!file)
         return -1;
 
-    unsigned char cnt[get_file_size(argv)];
+    char cnt[get_file_size(argv)];
     int n_bytes = fread(cnt, 1, sizeof(cnt), file);
 
     int lineas = 0, chars = 0, words = 0, tmp_max = 0, max_line = 0;
@@ -142,19 +145,24 @@ static int read(int argc, char* argv)
         if (lflag)
             if (cnt[i] == '\n')
                 lineas++;
-        /* TO-DO: Agregar wflag y mflag */
+
+        // No estoy seguro si es hasta -65.
+        if (mflag)
+            if (cnt[i] >= -65 && cnt[i] <= 127)
+                chars++;
+        /* TO-DO: Agregar wflag */
     }
 
     if (lflag)
-        printf(" %d ", lineas);
+        printf("%d ", lineas);
     if (wflag)
-        printf(" %d ", words);
+        printf("%d ", words);
     if (cflag)
-        printf(" %d ", n_bytes);
+        printf("%d ", n_bytes);
     if (mflag)
-        printf(" %d ", chars);
+        printf("%d ", chars);
     if (mlflag)
-        printf(" %d ", max_line);
+        printf("%d ", max_line);
 
     printf("%s\n", argv);
 
@@ -169,7 +177,7 @@ static void usage(void)
            "Las siguientes opciones pueden utilizarse para seleccionar cuáles cuentas se imprimen,"
            "siempre en el siguiente orden: newline, word, character, byte, maximum line length.\n"
            "  -c, --bytes            Imprime el número de bytes\n"
-           // "  -m, --chars            Imprime el número de caracteres\n"
+           "  -m, --chars            Imprime el número de caracteres\n"
            "  -l, --lines            Imprime el número de líneas\n"
            "  -L, --max-line-length  Imprime el tamaño máximo de línea\n"
            // "  -w, --words            Imprime el número de palabras\n\n"
