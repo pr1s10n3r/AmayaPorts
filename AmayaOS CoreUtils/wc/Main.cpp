@@ -33,9 +33,14 @@ static int cflag = 0, mflag = 0, lflag  = 0;
         /* total,     words,     max-length */
 static int tflag = 0, wflag = 0, mlflag = 0;
 
+/*
+ * El tipo de la variable `byte` podría ser de tipo `long` ya que AmayaOS al
+ * ser un sistema operativo de 32bits, entonces podría aguantar hasta el valor
+ * máximo de un long (2147483647). En teoría debería funcionar.
+ */
 static struct File {
-    int bytes, chars;
-    int lines, words;
+    long bytes;
+    int chars, lines, words;
     int max_length;
 } m_file = {0};
 static File total = {0};
