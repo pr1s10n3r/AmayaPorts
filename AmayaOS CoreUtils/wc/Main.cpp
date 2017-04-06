@@ -28,8 +28,17 @@ static int read(int, char*);
 static size_t get_file_size(const char*);
 
 static int hflag, vflag;
-        /* bytes, chars, lines, words, max-line */
-static int cflag, mflag, lflag, wflag, mlflag;
+        /* bytes,     chars,     lines */
+static int cflag = 0, mflag = 0, lflag  = 0;
+        /* total,     words,     max-length */
+static int tflag = 0, wflag = 0, mlflag = 0;
+
+static struct File {
+    int bytes, chars;
+    int lines, words;
+    int max_length;
+} m_file = {0};
+static File total = {0};
 
 int main(int argc, char* argv[])
 {
@@ -93,10 +102,7 @@ int main(int argc, char* argv[])
 
     /* Si no hay ninguna flag -> formateamos la salida. */
     if (cflag + mflag + lflag + wflag + mlflag == 0)
-    {
-        printf(" ");
         lflag = wflag = cflag = 1;
-    }
 
     if (hflag || vflag)
         return ret;
@@ -113,7 +119,25 @@ int main(int argc, char* argv[])
                 printf("%s: no se pudo abrir el archivo %s.\n", argv[0], argv[i]);
                 break;
             }
+            else
+                tflag += ret;
         }
+    }
+
+    if (tflag > 1)
+    {
+        if (lflag)
+            printf(" %d ", total.lines);
+        if (wflag)
+            printf(" %d ", total.words);
+        if (cflag)
+            printf(" %d ", total.bytes);
+        if (mflag)
+            printf(" %d ", total.chars);
+        if (mlflag)
+            printf(" %d ", total.max_length);
+
+        printf("total\n");
     }
 
     return ret;
@@ -121,16 +145,16 @@ int main(int argc, char* argv[])
 
 static int read(int argc, char* argv)
 {
+    m_file = {0, 0, 0, 0, 0};
     FILE *file = fopen(argv, "r");
     if (!file)
         return -1;
 
     char cnt[get_file_size(argv)];
-    int n_bytes = fread(cnt, 1, sizeof(cnt), file);
+    m_file.bytes = fread(cnt, 1, sizeof(cnt), file);
 
-    int lineas = 0, chars = 0, words = 0, tmp_max = 0, max_line = 0;
-    int in_word = 0;
-    for (unsigned int i = 0; i < n_bytes; i++)
+    int tmp_max = 0, in_word = 0;
+    for (unsigned int i = 0; i < m_file.bytes; i++)
     {
         // Aquí hay un "problema" cuando lee archivos binarios
         // No arroja el mismo resultado que el "wc" de GNU Coreutils.
@@ -141,18 +165,18 @@ static int read(int argc, char* argv)
             else
                 tmp_max = 0;
 
-            if (tmp_max > max_line)
-                max_line = tmp_max - 1;
+            if (tmp_max > m_file.max_length)
+                m_file.max_length = tmp_max - 1;
         }
 
         if (lflag)
             if (cnt[i] == '\n')
-                lineas++;
+                m_file.lines++;
 
         // No estoy seguro si es hasta -65, pero funciona.
         if (mflag)
             if (cnt[i] >= -65 && cnt[i] <= 127)
-                chars++;
+                m_file.chars++;
 
         if (wflag)
         {
@@ -165,7 +189,7 @@ static int read(int argc, char* argv)
                     if (in_word)
                     {
                         in_word = 0;
-                        words++;
+                        m_file.words++;
                     }
                     break;
                 default:
@@ -175,20 +199,39 @@ static int read(int argc, char* argv)
     }
 
     if (lflag)
-        printf("%d ", lineas);
+    {
+        total.lines += m_file.lines;
+        printf(" %d ", m_file.lines);
+    }
+
     if (wflag)
-        printf("%d ", words);
+    {
+        total.words += m_file.words;
+        printf(" %d ", m_file.words);
+    }
+
     if (cflag)
-        printf("%d ", n_bytes);
+    {
+        total.bytes += m_file.bytes;
+        printf(" %d ", m_file.bytes);
+    }
+
     if (mflag)
-        printf("%d ", chars);
+    {
+        total.chars += m_file.chars;
+        printf(" %d ", m_file.chars);
+    }
+
     if (mlflag)
-        printf("%d ", max_line);
+    {
+        total.max_length += m_file.max_length;
+        printf(" %d ", m_file.max_length);
+    }
 
     printf("%s\n", argv);
 
     fclose(file);
-    return 0;
+    return 1;
 }
 
 static void usage(void)
