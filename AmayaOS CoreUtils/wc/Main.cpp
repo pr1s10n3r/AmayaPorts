@@ -105,12 +105,12 @@ int main(int argc, char* argv[])
         return ret;
     }
 
+    if (hflag || vflag)
+        return ret;
+
     /* Si no hay ninguna flag -> formateamos la salida. */
     if (cflag + mflag + lflag + wflag + mlflag == 0)
         lflag = wflag = cflag = 1;
-
-    if (hflag || vflag)
-        return ret;
 
     for (i = 1; i < argc; i++)
     {
@@ -273,6 +273,6 @@ static size_t get_file_size(const char* fileName)
     struct stat st;
     if (stat(fileName, &st) < 0)
         return -1;
-    else
-        return st.st_size;
+
+    return st.st_size;
 }
