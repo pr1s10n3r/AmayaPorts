@@ -5,7 +5,7 @@ Libs, programs and more for AmayaOS project.
 # Author(s)
 
 * Alvaro Stagg [alvarostagg@protonmail.com]
-* **Twitter:** https://twitter.com/Algoru_
+* [**Twitter**](https://twitter.com/Algoru_)
 * **GnuSocial:** https://quitter.se/algoru
 
 # Donations
