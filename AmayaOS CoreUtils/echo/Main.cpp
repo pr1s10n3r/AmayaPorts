@@ -81,14 +81,14 @@ int main(int argc, char* argv[])
 static void usage(void)
 {
         printf("Modo de empleo: echo [OPCIÓN-CORTA]... [CADENA]...\n"
-           "                echo OPCIÓN-LARGA\n\n"
-           "  -n         no imprime una nueva línea\n\n"
-           "  --help     imprime éste texto y finaliza\n"
-           "  --version  muestra la versión y finaliza\n\n"
+               "                echo OPCIÓN-LARGA\n\n"
+               "  -n         no imprime una nueva línea\n\n"
+               "  --help     imprime éste texto y finaliza\n"
+               "  --version  muestra la versión y finaliza\n\n"
 
-           "AmayaOS Coreutils %s (C) 2017 AmayaOS Team\n"
-           "Licencia GNU GPL v3 <http://www.gnu.org/licenses/>.\n"
-           "Reportar errores a través de http://bugs.amayaos.com o alvarostagg@openmailbox.org\n", VERSION);
+               "AmayaOS Coreutils %s (C) 2017 AmayaOS Team\n"
+               "Licencia GNU GPL v3 <http://www.gnu.org/licenses/>.\n"
+               "Reportar errores a través de http://bugs.amayaos.com o alvarostagg@protonmail.com\n", VERSION);
 }
 
 static void version(void)
