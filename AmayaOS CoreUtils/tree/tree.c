@@ -87,6 +87,7 @@ int main(const int argc, const char* argv[])
     {
         printf("%s\n", path);
         status = tree(path);
+        printf("\n");
     }
 
     free(path);
@@ -103,6 +104,13 @@ static int is_directory(const char* path)
             is_dir = 1;
     
     return is_dir;
+}
+
+static void print_wspaces(int spaces, const char* name)
+{
+    for (int s = 0; s < spaces; s++)
+        printf(" ");
+    printf("\\- %s\n", name);
 }
 
 static int tree(const char* path)
@@ -122,9 +130,8 @@ static int tree(const char* path)
         if (strcmp(file->d_name, ".") == 0 || strcmp(file->d_name, "..") == 0)
             continue;
 
-        for (int s = 0; s < spaces; s++)
-            printf(" ");
-        printf("\\- %s\n", file->d_name);
+        if (!dflag)
+            print_wspaces(spaces, file->d_name);
         
         const size_t full_path_len = strlen(path) + strlen(file->d_name) + 2;
         char* full_path = (char*)malloc(full_path_len);
@@ -137,6 +144,9 @@ static int tree(const char* path)
 
         if (is_directory(full_path))
         {
+            if (dflag)
+                print_wspaces(spaces, file->d_name);
+
             spaces += 4;
             status = tree(full_path);
             spaces -= 4;
