@@ -15,7 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -23,11 +22,15 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <unistd.h>
+
+#define VERSION "0.1"
 
 static int tree(const char*);
 static int vflag = 0, hflag = 0;
 static int aflag = 0, dflag = 0;
+
+static void show_help(void);
+static void show_version(void);
 
 int main(const int argc, const char* argv[])
 {
@@ -40,10 +43,12 @@ int main(const int argc, const char* argv[])
         if (strcmp(argv[i], "--help") == 0)
         {
             hflag = 1;
+            show_help();
         }
         else if (strcmp(argv[i], "--version") == 0)
         {
             vflag = 1;
+            show_version();
         }
         else if (strcmp(argv[i], "-a") == 0)
         {
@@ -157,4 +162,19 @@ static int tree(const char* path)
 
     closedir(directory);
     return status;
+}
+
+static void show_version()
+{
+    printf("tree (AmayaOS Coreutils) v%s\n"
+           "Copyright © 2017 AmayaOS Team.\n"
+           "Licencia GPLv3+: GPL de GNU versión 3 o posterior\n"
+           "<http://gnu.org/licenses/gpl.html>.\n"
+           "Esto es software libre: usted es libre de cambiarlo y redistribuirlo.\n"
+           "No hay NINGUNA GARANTÍA, hasta donde permite la ley.\n\n", VERSION);
+}
+
+static void show_help(void)
+{
+    printf("tree [-ad] [--version] [--help] [directory...]\n");
 }
