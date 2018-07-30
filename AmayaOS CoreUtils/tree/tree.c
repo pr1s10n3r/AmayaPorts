@@ -28,6 +28,7 @@
 static int tree(const char*);
 static int vflag = 0, hflag = 0;
 static int aflag = 0, dflag = 0;
+static int fflag = 0;
 
 static void show_help(void);
 static void show_version(void);
@@ -38,7 +39,7 @@ int main(const int argc, const char* argv[])
     int i = 1;
     char* path = NULL;
 
-    for (; (i < argc) && !vflag && !hflag; i++)
+    for (i = 1; (i < argc) && !vflag && !hflag; i++)
     {
         if (strcmp(argv[i], "--help") == 0)
         {
@@ -57,6 +58,10 @@ int main(const int argc, const char* argv[])
         else if (strcmp(argv[i], "-d") == 0)
         {
             dflag = 1;
+        }
+        else if (strcmp(argv[i], "-f") == 0)
+        {
+            fflag = 1;
         }
         else
         {
@@ -134,11 +139,8 @@ static int tree(const char* path)
             continue;
         if (strcmp(file->d_name, ".") == 0 || strcmp(file->d_name, "..") == 0)
             continue;
-
-        if (!dflag)
-            print_wspaces(spaces, file->d_name);
         
-        const size_t full_path_len = strlen(path) + strlen(file->d_name) + 2;
+        const size_t full_path_len = (sizeof(char) * strlen(path)) + (sizeof(char) * strlen(file->d_name)) + 2;
         char* full_path = (char*)malloc(full_path_len);
         strcpy(full_path, path);
         
@@ -147,17 +149,32 @@ static int tree(const char* path)
         
         strcat(full_path, file->d_name);
 
+        if (!dflag)
+        {
+            if (fflag)
+                print_wspaces(spaces, full_path);
+            else
+                print_wspaces(spaces, file->d_name);
+        }
+
         if (is_directory(full_path))
         {
             if (dflag)
-                print_wspaces(spaces, file->d_name);
+            {
+                if (fflag)
+                    print_wspaces(spaces, full_path);
+                else
+                    print_wspaces(spaces, file->d_name);
+            }
 
             spaces += 4;
             status = tree(full_path);
             spaces -= 4;
         }
 
-        free(full_path);
+        printf("Haciendo free de %s\n", full_path);
+        free((char*)full_path);
+        printf("done\n");
     }
 
     closedir(directory);
@@ -167,7 +184,7 @@ static int tree(const char* path)
 static void show_version()
 {
     printf("tree (AmayaOS Coreutils) v%s\n"
-           "Copyright © 2017 AmayaOS Team.\n"
+           "Copyright © 2018 AmayaOS Team.\n"
            "Licencia GPLv3+: GPL de GNU versión 3 o posterior\n"
            "<http://gnu.org/licenses/gpl.html>.\n"
            "Esto es software libre: usted es libre de cambiarlo y redistribuirlo.\n"
@@ -176,5 +193,5 @@ static void show_version()
 
 static void show_help(void)
 {
-    printf("tree [-ad] [--version] [--help] [directory...]\n");
+    printf("tree [-adf] [--version] [--help] [directory...]\n");
 }
