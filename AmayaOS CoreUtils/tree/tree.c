@@ -36,7 +36,7 @@ static void show_version(void);
 int main(const int argc, const char* argv[])
 {
     int status = 0;
-    int i = 1;
+    int i = 1, path_set = 0;
     char* path = NULL;
 
     for (i = 1; (i < argc) && !vflag && !hflag; i++)
@@ -72,7 +72,16 @@ int main(const int argc, const char* argv[])
             }
             else
             {
-                path = (char*)argv[i];
+                if (path_set == 0)
+                {
+                    path = (char*)argv[i];
+                    path_set = 1;
+                }
+                else
+                {
+                    printf("%s: multiple paths not supported.\n", argv[0]);
+                    status = 1;
+                }
             }
         }
     }
@@ -80,9 +89,9 @@ int main(const int argc, const char* argv[])
     if (vflag || hflag)
         return status;
 
-    if (!path)
+    if (!path_set)
     {
-        path = (char*)malloc(2);
+        path = (char*)malloc(sizeof(char) * 2);
         strcpy(path, ".");
     }
 
@@ -100,7 +109,11 @@ int main(const int argc, const char* argv[])
         printf("\n");
     }
 
-    free(path);
+    if (!path_set)
+    {
+        free(path);
+    }
+
     return status;
 }
 
@@ -172,9 +185,7 @@ static int tree(const char* path)
             spaces -= 4;
         }
 
-        printf("Haciendo free de %s\n", full_path);
         free((char*)full_path);
-        printf("done\n");
     }
 
     closedir(directory);
